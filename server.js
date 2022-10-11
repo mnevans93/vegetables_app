@@ -1,6 +1,5 @@
 require('dotenv').config()
 const express = require('express')
-const vegetables = require('./models/vegetable')
 const mongoose = require('mongoose')
 const Vegetable = require('./models/vegetable.js')
 
@@ -17,10 +16,15 @@ const port = 3000
 
 //INDEX
 app.get('/vegetables', (req, res) => {
-    res.render('vegetables/Index', { vegetables: vegetables })
+    Vegetable.find({}, (error, allVegetables) => {
+        res.render('vegetables/Index', { vegetables: allVegetables })
+    })
 })
 
 //NEW
+app.get('/vegetables/new', (req, res) => {
+    res.render('vegetables/New')
+})
 
 //DELETE
 
@@ -34,16 +38,18 @@ app.post('/vegetables', (req, res) => {
         req.body.readyToEat = false
     }
     Vegetable.create(req.body, (error, createdVegetable) => {
-        res.send(createdVegetable)
+        res.redirect('/vegetables')
     })
 })
 
 //EDIT
 
 //SHOW
-app.get('/vegetables/:indexOfVegetablesArray', (req, res) => {
-    res.render('vegetables/Show', {
-        vegetable: vegetables[req.params.indexOfVegetablesArray]
+app.get('/vegetables/:id', (req, res) => {
+    Vegetable.findById(req.params.id, (err, foundVegetable) => {
+        res.render('vegetables/Show', {
+            vegetable: foundVegetable
+        })
     })
 })
 
